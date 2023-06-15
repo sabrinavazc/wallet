@@ -25,7 +25,7 @@ class Login extends React.Component {
     const { history, dispatchSetUserAction } = this.props;
     const { email } = this.state;
 
-    dispatchSetUserAction(email);
+    dispatchSetUserAction({ email });
 
     // e aqui pra eu mudar de página depois do evento eu dou um:
     history.push('/carteira');

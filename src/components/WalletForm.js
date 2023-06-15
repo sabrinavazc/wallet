@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { setWalletAction } from '../redux/actions/index';
 
 class WalletForm extends Component {
   state = {
@@ -7,6 +10,7 @@ class WalletForm extends Component {
     value: '',
     method: 'Dinheiro',
     currencies: [],
+    isLoading: true,
   };
 
   componentDidMount() {
@@ -19,7 +23,11 @@ class WalletForm extends Component {
       const data = await response.json();
       const currencies = Object.keys(data).filter((currency) => currency !== 'USDT');
 
-      this.setState({ currencies });
+      this.setState({ currencies, isLoading: false }); // Atualiza o estado e indica que os dados foram carregados
+
+      const { setWalletAction: dispatchSetWalletAction } = this.props;
+
+      dispatchSetWalletAction({ currencies });
     } catch (error) {
       console.error('Não foi possível buscar moedas:', error);
     }
@@ -31,7 +39,20 @@ class WalletForm extends Component {
   };
 
   render() {
-    const { value, description, method, tag, currencies, currency } = this.state;
+    const {
+      value,
+      description,
+      method,
+      tag,
+      currencies,
+      currency,
+      isLoading,
+    } = this.state;
+
+    // Verifica se os dados estão sendo carregados
+    if (isLoading) {
+      return <div>Carregando...</div>;
+    }
 
     return (
       // <form onSubmit={ this.handleSubmit }>
@@ -114,4 +135,16 @@ class WalletForm extends Component {
   }
 }
 
-export default WalletForm;
+WalletForm.propTypes = {
+  setWalletAction: PropTypes.func.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  currencies: state.wallet.currencies,
+});
+
+const mapDispatchToProps = {
+  setWalletAction,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(WalletForm);

@@ -33,6 +33,40 @@ class WalletForm extends Component {
     }
   };
 
+  handleSetExpenses = async () => {
+    const { description, tag, value, method, currencies } = this.state;
+
+    try {
+      const response = await fetch('https://economia.awesomeapi.com.br/json/all');
+      const data = await response.json();
+      const exchangeRates = data;
+      const { expenses } = this.props;
+
+      const expense = {
+        id: expenses.length,
+        description,
+        tag,
+        value,
+        method,
+        currencies: [...currencies], // Atualiza a propriedade 'currencies' no estado
+        exchangeRates,
+      };
+
+      const { addExpenseAction: dispatchAddExpenseAction } = this.props;
+
+      dispatchAddExpenseAction(expense);
+      this.setState({
+        description: '',
+        tag: 'Alimentação',
+        value: '',
+        method: 'Dinheiro',
+        currencies: [],
+      });
+    } catch (error) {
+      console.error('Erro ao buscar cotação:', error);
+    }
+  };
+
   handleChange = (e) => {
     const { name, value } = e.target;
     this.setState({ [name]: value });
@@ -68,7 +102,6 @@ class WalletForm extends Component {
             data-testid="value-input"
           />
         </label>
-
         <label htmlFor="description">
           Descrição da despesa
           <input
@@ -80,7 +113,6 @@ class WalletForm extends Component {
             data-testid="description-input"
           />
         </label>
-
         <label htmlFor="method">
           Método de Pagamento
           <select
@@ -95,7 +127,6 @@ class WalletForm extends Component {
             <option value="Cartão de débito">Cartão de débito</option>
           </select>
         </label>
-
         <label htmlFor="tag">
           Categoria da despesa
           <select
@@ -112,7 +143,6 @@ class WalletForm extends Component {
             <option value="Saúde">Saúde</option>
           </select>
         </label>
-
         <label htmlFor="currency">
           Moeda
           <select
@@ -129,22 +159,35 @@ class WalletForm extends Component {
             ))}
           </select>
         </label>
+        <button
+          onClick={ this.handleSetExpenses }
+        >
+          Adicionar despesa
 
+        </button>
       </form>
     );
   }
 }
 
+WalletForm.defaultProps = {
+  expenses: [],
+};
+
 WalletForm.propTypes = {
   setWalletAction: PropTypes.func.isRequired,
+  addExpenseAction: PropTypes.func.isRequired,
+  expenses: PropTypes.arrayOf(PropTypes.string),
 };
 
 const mapStateToProps = (state) => ({
   currencies: state.wallet.currencies,
+  expenses: state.wallet.expenses,
 });
 
 const mapDispatchToProps = {
   setWalletAction,
+  addExpenseAction,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WalletForm);

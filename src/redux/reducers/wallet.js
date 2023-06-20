@@ -1,5 +1,5 @@
 // Esse reducer será responsável por tratar o todas as informações relacionadas as despesas
-import { SET_DATA_WALLET } from '../actions/actionsTypes';
+import { SET_DATA_WALLET, ADD_EXPENSE } from '../actions/actionsTypes';
 
 // estado inicial da carteira
 const INITIAL_STATE = {
@@ -15,10 +15,19 @@ const walletReducer = (state = INITIAL_STATE, action) => {
     return {
       ...state,
       currencies: action.payload.currencies,
-      expenses: action.payload.expenses,
-      editor: action.payload.editor,
-      idToEdit: action.payload.idToEdit,
     };
+
+  case ADD_EXPENSE: {
+    const newExpense = {
+      id: state.expenses.length,
+      ...action.payload,
+    };
+    return {
+      ...state,
+      expenses: [...state.expenses, newExpense],
+    };
+  }
+
   default:
     return state;
   }

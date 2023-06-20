@@ -1,71 +1,33 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { setWalletAction } from '../redux/actions/index';
+import { fetchCurrencies } from '../redux/actions/index';
 
 class WalletForm extends Component {
   state = {
+    value: 0,
     description: '',
-    tag: 'Alimentação',
-    value: '',
+    currency: 'BRL',
     method: 'Dinheiro',
-    currencies: [],
+    tag: 'Alimentação',
     isLoading: true,
   };
 
   componentDidMount() {
-    this.fetchCurrencies();
+    const count = 1500;
+    const { dispatchFetchCurrencies } = this.props;
+    this.timer = setInterval(() => {
+      dispatchFetchCurrencies()
+        .then(() => {
+          this.setState({ isLoading: false });
+          clearInterval(this.timer);
+        });
+    }, count);
   }
 
-  fetchCurrencies = async () => {
-    try {
-      const response = await fetch('https://economia.awesomeapi.com.br/json/all');
-      const data = await response.json();
-      const currencies = Object.keys(data).filter((currency) => currency !== 'USDT');
-
-      this.setState({ currencies, isLoading: false }); // Atualiza o estado e indica que os dados foram carregados
-
-      const { setWalletAction: dispatchSetWalletAction } = this.props;
-
-      dispatchSetWalletAction({ currencies });
-    } catch (error) {
-      console.error('Não foi possível buscar moedas:', error);
-    }
-  };
-
-  handleSetExpenses = async () => {
-    const { description, tag, value, method, currencies } = this.state;
-
-    try {
-      const response = await fetch('https://economia.awesomeapi.com.br/json/all');
-      const data = await response.json();
-      const exchangeRates = data;
-      const { expenses } = this.props;
-
-      const expense = {
-        id: expenses.length,
-        description,
-        tag,
-        value,
-        method,
-        currencies: [...currencies], // Atualiza a propriedade 'currencies' no estado
-        exchangeRates,
-      };
-
-      const { addExpenseAction: dispatchAddExpenseAction } = this.props;
-
-      dispatchAddExpenseAction(expense);
-      this.setState({
-        description: '',
-        tag: 'Alimentação',
-        value: '',
-        method: 'Dinheiro',
-        currencies: [],
-      });
-    } catch (error) {
-      console.error('Erro ao buscar cotação:', error);
-    }
-  };
+  componentWillUnmount() {
+    clearInterval(this.timer);
+  }
 
   handleChange = (e) => {
     const { name, value } = e.target;
@@ -76,20 +38,15 @@ class WalletForm extends Component {
     const {
       value,
       description,
+      currency,
       method,
       tag,
-      currencies,
-      currency,
       isLoading,
     } = this.state;
-
-    // Verifica se os dados estão sendo carregados
-    if (isLoading) {
-      return <div>Carregando...</div>;
-    }
+    const { wallet } = this.props;
+    const { currencies } = wallet;
 
     return (
-      // <form onSubmit={ this.handleSubmit }>
       <form>
         <label htmlFor="value">
           Valor
@@ -145,49 +102,44 @@ class WalletForm extends Component {
         </label>
         <label htmlFor="currency">
           Moeda
-          <select
-            id="currency"
-            name="currency"
-            value={ currency }
-            onChange={ this.handleChange }
-            data-testid="currency-input"
-          >
-            {currencies.map((curr, index) => (
-              <option key={ index } value={ curr }>
-                {curr}
-              </option>
-            ))}
-          </select>
+          {isLoading ? '...' : null}
+          {!isLoading && (
+            <select
+              id="currency"
+              name="currency"
+              value={ currency }
+              data-testid="currency-input"
+              onChange={ (e) => this.handleChange(e) }
+            >
+              {currencies.map((curr) => (
+                <option key={ curr } value={ curr }>
+                  {curr}
+                </option>
+              ))}
+            </select>
+          )}
         </label>
-        <button
-          onClick={ this.handleSetExpenses }
-        >
+        <button>
           Adicionar despesa
-
         </button>
       </form>
     );
   }
 }
 
-WalletForm.defaultProps = {
-  expenses: [],
-};
-
 WalletForm.propTypes = {
-  setWalletAction: PropTypes.func.isRequired,
-  addExpenseAction: PropTypes.func.isRequired,
-  expenses: PropTypes.arrayOf(PropTypes.string),
+  dispatchFetchCurrencies: PropTypes.func.isRequired,
+  wallet: PropTypes.shape({
+    currencies: PropTypes.arrayOf(PropTypes.string),
+  }).isRequired,
 };
 
 const mapStateToProps = (state) => ({
-  currencies: state.wallet.currencies,
-  expenses: state.wallet.expenses,
+  wallet: state.wallet,
 });
 
-const mapDispatchToProps = {
-  setWalletAction,
-  addExpenseAction,
-};
+const mapDispatchToProps = (dispatch) => ({
+  dispatchFetchCurrencies: () => dispatch(fetchCurrencies()),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(WalletForm);

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { fetchCurrencies, fetchNewExpense } from '../redux/actions/index';
+import { fetchCurrencies, fetchNewExpense, setNewExpense } from '../redux/actions/index';
 
 class WalletForm extends Component {
   state = {
@@ -36,8 +36,17 @@ class WalletForm extends Component {
 
   handleSetNewExpense = (e) => {
     e.preventDefault();
-    const { dispatchFetchNewExpense: setNewExpense } = this.props;
-    setNewExpense(this.state);
+    const { dispatchNewExpense, expenses } = this.props;
+
+    const response = fetchNewExpense();
+
+    const newexp = {
+      id: expenses.length,
+      ...this.state,
+      exchangeRates: response,
+    };
+    dispatchNewExpense(setNewExpense(newexp));
+
     this.setState({
       value: '',
       description: '',
@@ -145,17 +154,34 @@ WalletForm.propTypes = {
   wallet: PropTypes.shape({
     currencies: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
-  dispatchFetchNewExpense: PropTypes.func.isRequired,
+  dispatchNewExpense: PropTypes.func.isRequired,
+  expenses: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      value: PropTypes.string.isRequired,
+      description: PropTypes.string.isRequired,
+      currency: PropTypes.string.isRequired,
+      method: PropTypes.string.isRequired,
+      tag: PropTypes.string.isRequired,
+      exchangeRates: PropTypes.objectOf(
+        PropTypes.shape({
+          name: PropTypes.string.isRequired,
+          ask: PropTypes.string.isRequired,
+        }),
+      ).isRequired,
+    }),
+  ).isRequired,
 };
 
 const mapStateToProps = (state) => ({
   wallet: state.wallet,
+  expenses: state.wallet.expenses,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   dispatchFetchCurrencies: () => dispatch(fetchCurrencies()),
-  dispatchFetchNewExpense:
-  (expense) => dispatch(fetchNewExpense(expense)),
+  dispatchNewExpense:
+  (expense) => dispatch(setNewExpense(expense)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WalletForm);

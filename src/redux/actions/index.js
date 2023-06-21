@@ -1,5 +1,5 @@
 import {
-  SET_USER, RECEIVE_CURRIENCIES, REQUEST_CURRIENCIES, RECEIVE_ERROR,
+  SET_USER, RECEIVE_CURRIENCIES, REQUEST_CURRIENCIES, RECEIVE_ERROR, SET_NEW_EXPENSE,
 } from './actionsTypes';
 
 const URL = 'https://economia.awesomeapi.com.br/json/all';
@@ -24,6 +24,12 @@ export const receiveError = () => ({
   type: RECEIVE_ERROR,
 });
 
+// seta novas despesas no estado
+export const setNewExpense = (expense) => ({
+  type: SET_NEW_EXPENSE,
+  payload: expense,
+});
+
 export const fetchCurrencies = () => async (dispatch) => {
   dispatch(requestCurrencies());
   const response = await fetch(URL);
@@ -32,19 +38,16 @@ export const fetchCurrencies = () => async (dispatch) => {
   dispatch(receiveCurrencies(filter));
 };
 
-// // requisição a API retornando uma função - THUNK
-// export const fetchCurrencies = () => async (dispatch) => {
-//   dispatch(requestCurrencies()); // aciona o loading
-//   try {
-//     // faz a requisicao pra api, enquanto o loading ta ativo
-//     const response = await fetch(URL);
-//     const data = await response.json();
-//     const currencies = Object.keys(data).filter((key) => key !== 'USDT');
-//     // se deu tudo certo, dispara a action de sucesso receive passando o type e o payload que pegou na api
-//     dispatch(receiveCurrencies(currencies));
-//     delete data.USDT;
-//     dispatch(receiveCurrencies(Object.keys(data)));
-//   } catch (error) {
-//     dispatch(receiveError());
-//   }
-// };
+// nova requisição para o btn adc despesa
+export const fetchNewExpense = (expense) => async (dispatch) => {
+  const response = await fetch(URL);
+  const data = await response.json();
+  delete data.USDT;
+
+  dispatch(setNewExpense({
+    ...expense,
+    exchangeRates: data,
+  }));
+  console.log(expense);
+  // console.log(expense, wallet);
+};

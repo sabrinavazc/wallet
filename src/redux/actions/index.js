@@ -25,10 +25,9 @@ export const receiveError = () => ({
 });
 
 // seta novas despesas no estado
-export const setNewExpense = (expense, currencies) => ({
+export const setNewExpense = (expense) => ({
   type: SET_NEW_EXPENSE,
   expense,
-  currencies,
 });
 
 export const fetchCurrencies = () => async (dispatch) => {
@@ -40,15 +39,24 @@ export const fetchCurrencies = () => async (dispatch) => {
 };
 
 // nova requisição para o btn adc despesa
-export const fetchNewExpense = (expense) => async (dispatch) => {
+export const fetchNewExpense = (state) => async (dispatch) => {
   try {
     const response = await fetch(URL);
     const data = await response.json();
-    delete data.USDT;
-    dispatch(setNewExpense(expense, data));
+    const { currency, description, method, tag, value, id } = state;
+
+    const expense = {
+      id,
+      value,
+      description,
+      currency,
+      method,
+      tag,
+      exchangeRates: data,
+    };
+
+    dispatch(setNewExpense(expense));
   } catch (error) {
     console.error('Error fetching new expense:', error);
   }
 };
-
-// console.log(expense);

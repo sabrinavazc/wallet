@@ -9,6 +9,7 @@ const INITIAL_STATE = {
   editor: false,
   idToEdit: 0,
   isLoading: false,
+  id: 0,
 };
 
 const walletReducer = (state = INITIAL_STATE, action) => {
@@ -28,15 +29,7 @@ const walletReducer = (state = INITIAL_STATE, action) => {
   case SET_NEW_EXPENSE:
     return {
       ...state,
-      expenses: [...state.expenses, {
-        id: state.expenses.length,
-        value: action.expense.value,
-        description: action.expense.description,
-        currency: action.expense.currency,
-        method: action.expense.method,
-        tag: action.expense.tag,
-        exchangeRates: action.currencies,
-      }],
+      expenses: [...state.expenses, action.expense],
     };
 
   default:

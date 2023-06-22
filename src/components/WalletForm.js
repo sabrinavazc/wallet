@@ -11,6 +11,7 @@ class WalletForm extends Component {
     method: 'Dinheiro',
     tag: 'Alimentação',
     isLoading: true,
+    id: 0,
   };
 
   componentDidMount() {
@@ -34,26 +35,20 @@ class WalletForm extends Component {
     this.setState({ [name]: value });
   };
 
-  handleSetNewExpense = (e) => {
+  handleSetNewExpense = async (e) => {
     e.preventDefault();
-    const { dispatchNewExpense, expenses } = this.props;
+    const { dispatchFetchNewExpense } = this.props;
+    const { currency, description, method, tag, value, id } = this.state;
+    dispatchFetchNewExpense({ currency, description, method, tag, value, id });
 
-    const response = fetchNewExpense();
-
-    const newexp = {
-      id: expenses.length,
-      ...this.state,
-      exchangeRates: response,
-    };
-    dispatchNewExpense(setNewExpense(newexp));
-
-    this.setState({
+    this.setState((prev) => ({
       value: '',
       description: '',
       currency: 'USD',
       method: 'Dinheiro',
       tag: 'Alimentação',
-    });
+      id: prev.id + 1,
+    }));
   };
 
   render() {
@@ -69,7 +64,11 @@ class WalletForm extends Component {
     const { currencies } = wallet;
 
     return (
-      <form>
+      <form
+        onSubmit={ (e) => {
+          e.preventDefault();
+        } }
+      >
         <label htmlFor="value">
           Valor
           <input
@@ -154,23 +153,7 @@ WalletForm.propTypes = {
   wallet: PropTypes.shape({
     currencies: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
-  dispatchNewExpense: PropTypes.func.isRequired,
-  expenses: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      value: PropTypes.string.isRequired,
-      description: PropTypes.string.isRequired,
-      currency: PropTypes.string.isRequired,
-      method: PropTypes.string.isRequired,
-      tag: PropTypes.string.isRequired,
-      exchangeRates: PropTypes.objectOf(
-        PropTypes.shape({
-          name: PropTypes.string.isRequired,
-          ask: PropTypes.string.isRequired,
-        }),
-      ).isRequired,
-    }),
-  ).isRequired,
+  dispatchFetchNewExpense: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -180,8 +163,9 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   dispatchFetchCurrencies: () => dispatch(fetchCurrencies()),
-  dispatchNewExpense:
+  dispatchSetNewExpense:
   (expense) => dispatch(setNewExpense(expense)),
+  dispatchFetchNewExpense: (state) => dispatch(fetchNewExpense(state)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WalletForm);

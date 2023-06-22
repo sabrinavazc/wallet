@@ -1,23 +1,22 @@
 .table-container {
-    overflow-x: auto;
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
+  overflow-x: auto;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th,
+td {
+  border-bottom: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
   th,
   td {
-    padding: 8px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+    font-size: 14px;
   }
-  
-  @media (max-width: 768px) {
-    th,
-    td {
-      font-size: 14px;
-    }
-  }
-  
+}

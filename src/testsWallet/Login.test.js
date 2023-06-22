@@ -16,6 +16,16 @@ describe('Pagina de Login', () => {
     expect(history.location.pathname).toBe('/');
   });
 
+  it('Verifica se a mensagem de erro é exibida ao digitar um email inválido', () => {
+    const { history } = renderWithRouterAndRedux(<App />);
+    expect(history.location.pathname).toBe('/');
+
+    const capturEmail = screen.getByTestId(email);
+    userEvent.type(capturEmail, 'emailinvalido');
+
+    expect(screen.getByTestId('email-error')).toBeInTheDocument();
+  });
+
   it('Verifica rederização dos inputs de email e senha', () => {
     renderWithRouterAndRedux(<App />);
 
@@ -70,5 +80,18 @@ describe('Pagina de Login', () => {
     const buttonLogin = screen.getByRole('button', { name: /Entrar/i });
     userEvent.click(buttonLogin);
     expect(history.location.pathname).toBe('/carteira');
+  });
+
+  it('Verifica se o estado global é atualizado corretamente ao fazer login', () => {
+    const { store } = renderWithRouterAndRedux(<App />);
+
+    const capturEmail = screen.getByTestId(email);
+    userEvent.type(capturEmail, emailValidInput);
+    const capturSenha = screen.getByTestId(senha);
+    userEvent.type(capturSenha, 'senhacorreta');
+    const buttonLogin = screen.getByRole('button', { name: /Entrar/i });
+    userEvent.click(buttonLogin);
+
+    expect(store.getState().user.email).toBe(emailValidInput);
   });
 });

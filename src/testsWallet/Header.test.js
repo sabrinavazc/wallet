@@ -4,7 +4,7 @@ import { renderWithRouterAndRedux } from '../tests/helpers/renderWith';
 import Header from '../components/Header';
 
 describe('Header component', () => {
-  test('renders email and total expenses correctly', () => {
+  it('Verifica se as despesas, moedas e email são renderizados', () => {
     const initialState = {
       user: { email: 'test@example.com' },
       wallet: {
@@ -38,5 +38,8 @@ describe('Header component', () => {
 
     const totalField = screen.getByTestId('total-field');
     expect(totalField).toHaveTextContent('165.00');
+
+    const currencyField = screen.getByTestId('header-currency-field');
+    expect(currencyField).toHaveTextContent('BRL');
   });
 });

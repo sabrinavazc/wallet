@@ -67,7 +67,7 @@ class Login extends React.Component {
 
         {
           showInvalidEmailMessage
-        && <p>Por favor, insira um email válido, como alguem@alguem.com</p>
+        && <p data-testid="email-error">Por favor, insira um email válido.</p>
         }
 
         <button

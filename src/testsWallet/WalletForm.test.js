@@ -3,7 +3,6 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithRouterAndRedux } from '../tests/helpers/renderWith';
 import WalletForm from '../components/WalletForm';
-import App from '../App';
 
 describe('WalletForm', () => {
   it('deve renderizar corretamente os campos do formulário', () => {

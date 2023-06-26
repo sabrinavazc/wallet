@@ -1,6 +1,6 @@
 // Esse reducer será responsável por tratar o todas as informações relacionadas as despesas
 import { RECEIVE_CURRIENCIES, REQUEST_CURRIENCIES,
-  SET_NEW_EXPENSE } from '../actions/actionsTypes';
+  SET_NEW_EXPENSE, DELETE_EXPENSE } from '../actions/actionsTypes';
 
 // estado inicial da carteira
 const INITIAL_STATE = {
@@ -30,6 +30,14 @@ const walletReducer = (state = INITIAL_STATE, action) => {
     return {
       ...state,
       expenses: [...state.expenses, action.expense],
+    };
+
+  case DELETE_EXPENSE:
+    return {
+      ...state,
+      expenses: state.expenses.filter(
+        (expense) => expense.id !== action.id,
+      ),
     };
 
   default:

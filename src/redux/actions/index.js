@@ -1,5 +1,7 @@
 import {
-  SET_USER, RECEIVE_CURRIENCIES, REQUEST_CURRIENCIES, RECEIVE_ERROR, SET_NEW_EXPENSE,
+  SET_USER,
+  DELETE_EXPENSE,
+  RECEIVE_CURRIENCIES, REQUEST_CURRIENCIES, RECEIVE_ERROR, SET_NEW_EXPENSE,
 } from './actionsTypes';
 
 const URL = 'https://economia.awesomeapi.com.br/json/all';
@@ -28,6 +30,13 @@ export const receiveError = () => ({
 export const setNewExpense = (expense) => ({
   type: SET_NEW_EXPENSE,
   expense,
+});
+
+// deleta uma despesa posta na tabela
+// actions.js
+export const deleteExpense = (id) => ({
+  type: DELETE_EXPENSE,
+  id,
 });
 
 export const fetchCurrencies = () => async (dispatch) => {

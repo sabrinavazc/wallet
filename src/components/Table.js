@@ -1,14 +1,25 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { deleteExpense } from '../redux/actions/index';
+import { deleteExpense, editExpense } from '../redux/actions/index';
 
 class Table extends Component {
+  // state = {
+  //   // editingExpense: null,
+  // };
+
   handleDeleteExpense = (e, id) => {
     e.preventDefault();
     const { dispatchDeleteExpense } = this.props;
     dispatchDeleteExpense(id);
   };
+
+  // handleEditExpense = (e, id) => {
+  //   e.preventDefault();
+  //   const { expenses } = this.props;
+  //   const expenseToEdit = expenses.find((expense) => expense.id === id);
+  //   // this.setState({ editingExpense: expenseToEdit });
+  // };
 
   render() {
     const { expenses } = this.props;
@@ -45,9 +56,17 @@ class Table extends Component {
                 <td>Real</td>
                 <td>
                   <button
+                    data-testid="delete-btn"
                     onClick={ (e) => this.handleDeleteExpense(e, expense.id) }
                   >
                     Excluir
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="edit-btn"
+                    // onClick={ () => this.handleEditExpense(expense.id) }
+                  >
+                    Editar
                   </button>
                 </td>
               </tr>
@@ -76,6 +95,7 @@ Table.propTypes = {
     }),
   ).isRequired,
   dispatchDeleteExpense: PropTypes.func.isRequired,
+  // dispatchEditExpense: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -83,7 +103,8 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  dispatchDeleteExpense: (newExpenses) => dispatch(deleteExpense(newExpenses)),
+  dispatchDeleteExpense: (id) => dispatch(deleteExpense(id)),
+  dispatchEditExpense: (expense) => dispatch(editExpense(expense)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Table);

@@ -1,5 +1,5 @@
 import {
-  SET_USER,
+  SET_USER, EDIT_EXPENSE,
   DELETE_EXPENSE,
   RECEIVE_CURRIENCIES, REQUEST_CURRIENCIES, RECEIVE_ERROR, SET_NEW_EXPENSE,
 } from './actionsTypes';
@@ -37,6 +37,11 @@ export const setNewExpense = (expense) => ({
 export const deleteExpense = (id) => ({
   type: DELETE_EXPENSE,
   id,
+});
+
+export const editExpense = (expense) => ({
+  type: EDIT_EXPENSE,
+  expense,
 });
 
 export const fetchCurrencies = () => async (dispatch) => {
